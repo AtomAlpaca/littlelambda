@@ -9,7 +9,9 @@ doApply (VLam (Closure e m) x) y = eval ((x, y) : e) m
 doApply (VNeutral x) y = VNeutral (NApp x y)
 
 eval :: Env -> Expr -> Value
-eval e (Var v) = fromJust $ lookup v e
+eval e (Var v) = case lookup v e of
+    Nothing -> VNeutral (NVar v)
+    Just x  -> x
 eval e (App u v) = doApply (eval e u) (eval e v)
 eval e (Lam x m) = VLam (Closure e m) x
 eval e (Let x m y) = eval e' m where e' = ((x, (eval e m)) : e)
