@@ -14,7 +14,7 @@ eval e (Var v) = case lookup v e of
     Just x  -> x
 eval e (App u v) = doApply (eval e u) (eval e v)
 eval e (Lam x m) = VLam (Closure e m) x
-eval e (Let x m y) = eval e' m where e' = ((x, (eval e m)) : e)
+eval e (Let x m y) = eval e' y where e' = ((x, (eval e m)) : e)
 
 newVar :: [String] -> String
 newVar ns = newVarHelper ns "x"
