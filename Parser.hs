@@ -50,6 +50,13 @@ satisfy f = item >>= \c -> if f c then return c else empty
 char :: Char -> Parser Char
 char c = satisfy (== c)
 
+isBlank :: Char -> Bool
+isBlank c = case c of
+    ' '  -> True
+    '\t' -> True
+    '\n' -> True
+    _    -> False
+
 isLambda :: Parser Char
 isLambda = satisfy (== 'λ')
 
@@ -58,6 +65,9 @@ between s x e = s *> x <* e
 
 skip :: Parser s -> Parser ()
 skip p = many p >> return ()
+
+skipBlank :: Parser ()
+skipBlank = many (satisfy isBlank) >> return ()
 
 pBucket p = between (char '(') p (char ')')
 
@@ -70,9 +80,9 @@ string (x : xs) = do
 
 pName :: Parser Name
 pName = do
-    skip (char ' ')
+    skipBlank
     x <- some (satisfy isAlphaNum)
-    skip (char ' ')
+    skipBlank
     return $ Name x
 
 pAtom :: Parser Expr
@@ -86,7 +96,9 @@ pLam = do
     char 'λ'
     xs <- some pName
     char '.'
+    skipBlank
     m  <- pExpr
+    skipBlank
     return $ foldr Lam m xs
 
 pLet :: Parser Expr
@@ -94,8 +106,11 @@ pLet = do
     string "let"
     x <- pName
     char '='
+    skipBlank
     m <- pExpr
+    skipBlank
     char ';'
+    skipBlank
     y <- pExpr
     return $ Let x m y
 

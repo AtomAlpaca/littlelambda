@@ -1,0 +1,7 @@
+let five = λs z. s (s (s (s (s z))));
+let add	= λa b s z. a s (b s z);
+let mul	= λa b s z. a (b s) z;
+let ten	= add five five;
+let hundred	= mul ten ten;
+let thousand = mul ten hundred;
+thousand
